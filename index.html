@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คำนวณคะแนนฟิสิกส์สัประยุทธ์</title>
+    <title>โปรแกรมคำนวณคะแนนฟิสิกส์สัประยุทธ์</title>
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
@@ -46,7 +46,7 @@
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-sizing: border-box;
+            box-sizing: border-box; /* สำคัญเพื่อให้ padding ไม่ล้น */
             font-size: 16px;
         }
         .score-input-group input {
@@ -82,7 +82,7 @@
         }
         .radio-option input {
             margin-right: 10px;
-            width: auto;
+            width: auto; /* รีเซ็ตความกว้างสำหรับ radio button */
         }
         button.calc-btn {
             background-color: #2980b9;
@@ -109,7 +109,7 @@
             padding: 20px;
             background: #e8f6f3;
             border-radius: 8px;
-            display: none;
+            display: none; /* ซ่อนไว้ก่อน */
         }
         .error {
             color: red;
@@ -124,29 +124,29 @@
     <h2>คำนวณคะแนนฟิสิกส์สัประยุทธ์</h2>
 
     <div class="section">
-        <label>กรอกคะแนน (n)</label>
+        <label>ตอนที่ 1: กรอกคะแนน (n)</label>
         <div id="score-container" class="score-input-group">
-            <input type="number" class="score-input" placeholder="คะแนน..." step="0.1">
+            <input type="number" class="score-input" placeholder="ใส่คะแนน..." step="0.1">
         </div>
         <button class="add-btn" onclick="addScoreField()">+ เพิ่มช่องกรอกคะแนน</button>
     </div>
 
     <div class="section">
-        <label>จำนวนกรรมการ (p)</label>
-        <input type="number" id="judges-count" placeholder="จำนวนกรรมการ" value="8">
+        <label>ตอนที่ 2: จำนวนกรรมการ (p)</label>
+        <input type="number" id="judges-count" placeholder="ระบุจำนวนกรรมการ" value="5">
     </div>
 
     <div class="section">
-        <label>บทบาท</label>
+        <label>ตอนที่ 3: เลือกบทบาท</label>
         <div class="radio-group">
             <label class="radio-option">
-                <input type="radio" name="role" value="3" checked> ฝ่ายนำเสนอ
+                <input type="radio" name="role" value="3" checked> ฝ่ายนำเสนอ (t1) [คูณ 3]
             </label>
             <label class="radio-option">
-                <input type="radio" name="role" value="2"> ฝ่ายซักค้าน
+                <input type="radio" name="role" value="2"> ฝ่ายซักค้าน (t2) [คูณ 2]
             </label>
             <label class="radio-option">
-                <input type="radio" name="role" value="1"> ฝ่ายวิพากษ์
+                <input type="radio" name="role" value="1"> ฝ่ายวิพากษ์ (t3) [คูณ 1]
             </label>
         </div>
     </div>
@@ -159,20 +159,20 @@
 </div>
 
 <script>
-    
+    // ฟังก์ชันเพิ่มช่องกรอกตัวเลข
     function addScoreField() {
         const container = document.getElementById('score-container');
         const input = document.createElement('input');
         input.type = 'number';
         input.className = 'score-input';
         input.placeholder = 'ใส่คะแนน...';
-        input.step = '0.1';
+        input.step = '0.1'; // รองรับทศนิยม
         container.appendChild(input);
     }
 
-   
+    // ฟังก์ชันคำนวณ
     function calculateScore() {
-       
+        // 1. รับค่าคะแนนจากตอนที่ 1
         const inputs = document.querySelectorAll('.score-input');
         let scores = [];
         inputs.forEach(input => {
@@ -182,20 +182,20 @@
         });
 
         if (scores.length === 0) {
-            alert("กรอกคะแนนอย่างน้อย 1 ช่อง");
+            alert("กรุณากรอกคะแนนอย่างน้อย 1 ช่อง");
             return;
         }
 
-      
+        // 2. รับค่าจำนวนกรรมการ (p)
         const pInput = document.getElementById('judges-count').value;
         const p = parseFloat(pInput);
 
         if (!p || p <= 1) {
-            alert("กรรมการต้องมากกว่า 1 คน");
+            alert("จำนวนกรรมการต้องมากกว่า 1 คน (เพื่อไม่ให้ตัวหารเป็น 0)");
             return;
         }
 
-    
+        // 3. รับค่าตัวคูณจากบทบาท
         const roleRadios = document.getElementsByName('role');
         let multiplier = 1;
         for (const radio of roleRadios) {
@@ -205,38 +205,38 @@
             }
         }
 
-        // ขั้นตอนคำนวณ
+        // --- เริ่มขั้นตอนการคำนวณตามสูตร ---
 
-       
+        // หา Max และ Min
         const maxScore = Math.max(...scores);
         const minScore = Math.min(...scores);
 
-        // เฉลี่ยmaxกับmin
+        // หาค่าเฉลี่ยของ Max และ Min
         const avgMaxMin = (maxScore + minScore) / 2;
 
-        // รวมหมด
+        // หาผลรวมทั้งหมด (Sum)
         const sumAll = scores.reduce((a, b) => a + b, 0);
 
-        // รวมหมด-เฉลี่ยmax,min
+        // นำค่าทั้งหมด (Sum) มาลบกับ ค่าเฉลี่ย (AvgMaxMin) => ก้อนด้านบน
         const numerator = sumAll - avgMaxMin;
 
-        // หารกรรมการที่เหลือ
+        // ตัวหาร = จำนวนกรรมการ (p) - 1
         const denominator = p - 1;
 
-        // ค่าหลัก
+        // คำนวณค่าหลัก
         const baseScore = numerator / denominator;
 
-        // คูณกับตัวคูณ
+        // นำไปคูณกับตัวคูณตามบทบาท (3, 2, หรือ 1)
         const finalScore = baseScore * multiplier;
 
-        // แสดงผล
+        // --- แสดงผล ---
         const resultArea = document.getElementById('result-area');
         const scoreSpan = document.getElementById('final-score');
         
         resultArea.style.display = 'block';
-        scoreSpan.innerText = finalScore.toFixed(2); 
+        scoreSpan.innerText = finalScore.toFixed(2); // แสดงทศนิยม 2 ตำแหน่ง
         
-        
+        // Console Log เพื่อตรวจสอบความถูกต้อง (สำหรับคนเขียนโค้ดดู)
         console.log("Scores:", scores);
         console.log("Max:", maxScore, "Min:", minScore);
         console.log("Avg(Max+Min):", avgMaxMin);
@@ -248,128 +248,5 @@
     }
 </script>
 
-</body>
-</html>
-}
-
-        .buttons {
-            position: relative; /* สำคัญ: เพื่อให้ปุ่มเริ่มอ้างอิงจากตรงนี้ */
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.2s ease; /* ใส่ transition ให้ขยับนุ่มนวล */
-            z-index: 20;
-        }
-
-        #yes-btn {
-            background-color: #4caf50;
-            color: white;
-            font-weight: bold;
-        }
-
-        #yes-btn:hover {
-            transform: scale(1.1);
-        }
-
-        #no-btn {
-            background-color: #f44336;
-            color: white;
-            font-weight: bold;
-            position: relative; /* เริ่มต้นเป็น relative เพื่อให้อยู่คู่กันก่อน */
-        }
-
-        #success-page {
-            display: none;
-            text-align: center;
-            flex-direction: column;
-            align-items: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-        }
-
-        #success-page img {
-            max-width: 300px;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container" id="question-page">
-        <h1>เป็นแฟนกันนะ?</h1>
-        
-        <div class="buttons">
-            <button id="yes-btn">ตกลง (Yes)</button>
-            <button id="no-btn">ไม่เอา (No)</button>
-        </div>
-    </div>
-
-    <div id="success-page">
-        <h1>เย้! ขอบคุณนะ รักที่สุดเลย ❤️</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2QyZ3E2bHlidndwYjB4YjV4YjV4YjV4YjV4YjV4YjV4YjV4YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif" alt="รูปภาพน่ารัก">
-    </div>
-
-    <script>
-        const yesBtn = document.getElementById('yes-btn');
-        const noBtn = document.getElementById('no-btn');
-        const questionPage = document.getElementById('question-page');
-        const successPage = document.getElementById('success-page');
-
-        // ฟังก์ชันเมื่อกดปุ่ม Yes
-        yesBtn.addEventListener('click', () => {
-            questionPage.style.display = 'none';
-            successPage.style.display = 'flex';
-        });
-
-        // ฟังก์ชันขยับปุ่ม No
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('click', moveButton); // กันคนกดทัน ให้กดแล้วหนีด้วย
-
-        function moveButton() {
-            // ดึงตำแหน่งปัจจุบันของปุ่ม
-            // getBoundingClientRect จะให้ค่าตำแหน่งเทียบกับหน้าจอ
-            const rect = noBtn.getBoundingClientRect();
-            
-            // เปลี่ยน position เป็น absolute เพื่อให้ขยับไปทั่วจอได้ (ถ้ายังไม่ได้เปลี่ยน)
-            if (noBtn.style.position !== 'absolute') {
-                noBtn.style.position = 'absolute';
-                // ตั้งค่าตำแหน่งเริ่มต้นให้ตรงกับที่มันอยู่ปัจจุบันก่อนขยับ
-                noBtn.style.left = rect.left + 'px';
-                noBtn.style.top = rect.top + 'px';
-            }
-
-            // ระยะที่จะให้ขยับ (ขยับไปทางซ้ายขวาบนล่าง ไม่เกิน 200px จากจุดเดิม)
-            const moveRange = 200; 
-
-            // คำนวณตำแหน่งใหม่ (สุ่มค่าลบ หรือ บวก)
-            let newX = rect.left + (Math.random() * moveRange * 2 - moveRange);
-            let newY = rect.top + (Math.random() * moveRange * 2 - moveRange);
-
-            // เช็คขอบเขตหน้าจอ (ไม่ให้หลุดออกนอกจอ)
-            if (newX < 0) newX = 10;
-            if (newX > window.innerWidth - noBtn.offsetWidth) newX = window.innerWidth - noBtn.offsetWidth - 10;
-            
-            if (newY < 0) newY = 10;
-            if (newY > window.innerHeight - noBtn.offsetHeight) newY = window.innerHeight - noBtn.offsetHeight - 10;
-
-            // สั่งย้ายตำแหน่ง
-            noBtn.style.left = newX + 'px';
-            noBtn.style.top = newY + 'px';
-        }
-    </script>
 </body>
 </html>
